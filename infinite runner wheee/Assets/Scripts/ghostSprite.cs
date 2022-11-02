@@ -1,12 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class ghostSprite : MonoBehaviour
 {
     public float speed;
     Rigidbody2D rb;
     Vector2 boundary;
+    int life = 5;
+    bool dead = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +28,11 @@ public class ghostSprite : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (dead) {
+            Destroy(GameObject.FindGameObjectWithTag("fence"));
+            rb.gravityScale = 10;
+            return;
+        }
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector2 movement = Vector2.zero;
         if (Input.GetMouseButtonDown(0))
@@ -44,6 +52,14 @@ public class ghostSprite : MonoBehaviour
             
         }
 
+    }
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("fence"))
+        {
+            life--;
+            if (life == 0) dead = true;
+        }
     }
 
     Vector2 GetCameraSize() {
